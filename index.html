@@ -436,8 +436,10 @@ function load(){
   }
   updateStatus();
 }
+var firebaseFailed=false;
 function updateStatus(){
   var el=$("#status");
+  if(!cloudDb&&firebaseFailed){el.textContent="No se pudo conectar (revisa tu internet o abre el link, no el archivo)";el.className="status bad";return;}
   if(cloudDb){
     if(outbox.length){el.textContent="Sin conexión: "+outbox.length+" cambio(s) por subir";el.className="status bad";}
     else{el.textContent="En línea y sincronizado";el.className="status";}
@@ -524,6 +526,7 @@ async function initCloud(){
       }
       cloudDb=makeFirebaseDb(window.FIREBASE_CONFIG);
     }catch(e){cloudDb=null;}
+    if(!cloudDb){firebaseFailed=true;updateStatus();}
   }
   if(!cloudDb)return;
   outbox=loadOutbox();
